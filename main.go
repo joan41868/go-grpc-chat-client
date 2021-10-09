@@ -62,7 +62,6 @@ func main() {
 	}
 	connectionRequest := util.NewConnectionRequestForUsername(*usernameFlag)
 
-	//user1Stream, err := cl.Connect(context.Background(), connectionRequest)
 	stream, err := cl.Subscribe(context.Background(), &proto.RoomRequest{
 		RoomID:                   *roomFlag,
 		InitialConnectionRequest: connectionRequest,
@@ -78,6 +77,5 @@ func main() {
 
 	/* graceful shutdown */
 	<-done
-	cl.Disconnect(context.Background(), connectionRequest)
 	conn.Close()
 }
