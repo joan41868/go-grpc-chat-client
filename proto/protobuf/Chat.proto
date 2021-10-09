@@ -1,0 +1,47 @@
+syntax = "proto3";
+option go_package = "./proto/";
+
+message Empty {
+
+}
+
+message RoomRequest {
+  string RoomID = 1;
+  ConnectionRequest initialConnectionRequest = 2;
+};
+
+message ListRoomResponse {
+  repeated string RoomIDs = 1;
+}
+
+message ConnectionRequest {
+  User user = 1;
+  string serverId = 2;
+}
+
+// Represents the user entity in the chat app
+message User {
+  string ID = 1;
+  string username = 2;
+}
+
+// ChatMessage represents a message sent from user A to user B
+message ChatMessage {
+  string senderID = 1; // the ID of the sender. Typically the username at the specific gateway
+  string recipientID = 2; // the ID of the recipient
+  bytes content = 3;
+  uint64 timestamp = 4;
+
+  // misc/helper
+  string senderUsername = 5;
+}
+
+service ChatService {
+  rpc Connect(ConnectionRequest) returns (stream ChatMessage); // connect to the chat server and start receiving messages
+  rpc SendMessage(ChatMessage) returns (Empty); // send a message t oa given chat room
+  rpc Disconnect(ConnectionRequest) returns (Empty); // disconnect from the server
+  // TODO:
+  rpc Subscribe(RoomRequest) returns (stream ChatMessage); // subscribe to a room
+  rpc UnsubscribeAll(ConnectionRequest) returns (Empty); // unsubscribe from all rooms
+  rpc ListRooms(Empty) returns (ListRoomResponse); // get all the rooms on the selected gateway
+}
