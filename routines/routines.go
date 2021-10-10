@@ -22,9 +22,6 @@ func ListenForInput(cl proto.ChatServiceClient, wg *sync.WaitGroup, sender, reci
 		sc := bufio.NewScanner(os.Stdin)
 		sc.Scan()
 		msg := sc.Text()
-		//if msg[0] == uint8('\\') {
-		//	// TODO: parse user command?
-		//}
 		if len(msg) > 1 {
 			nm := util.NewMessageFrom(sender, recipient, msg)
 			_, err := cl.SendMessage(context.Background(), nm)
@@ -40,7 +37,7 @@ func ListenForInput(cl proto.ChatServiceClient, wg *sync.WaitGroup, sender, reci
 	wg.Done()
 }
 
-func ListenForMessages(done chan int, wg *sync.WaitGroup, messageStream proto.ChatService_ConnectClient, initiatorId string) {
+func ListenForMessages(done chan int, wg *sync.WaitGroup, messageStream proto.ChatService_SubscribeClient, initiatorId string) {
 	wg.Add(1)
 	for {
 		msg, err := messageStream.Recv()
@@ -53,8 +50,8 @@ func ListenForMessages(done chan int, wg *sync.WaitGroup, messageStream proto.Ch
 				break
 			}
 		}
-		if msg != nil && msg.Timestamp != 0 && msg.SenderID != initiatorId {
-			fmt.Printf("\n\x1b[32m<%s>: %s\n\x1b[0m", msg.SenderUsername, string(msg.Content))
+		if msg != nil && msg.Timestamp != 0 && msg.Sender != initiatorId {
+			fmt.Printf("\n\x1b[32m<%s>: %s\n\x1b[0m", msg.Sender, string(msg.Content))
 			fmt.Printf("\n<You>:")
 		}
 	}

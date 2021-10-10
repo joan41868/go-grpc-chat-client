@@ -13,7 +13,7 @@ import (
 	"sync"
 )
 
-// TODO: add gateway for server selection
+// TODO: docker?
 func main() {
 	done := make(chan int, 1)
 	wg := new(sync.WaitGroup)
@@ -54,8 +54,8 @@ func main() {
 
 	if *listRoomsFlag {
 		rooms, _ := cl.ListRooms(context.Background(), &proto.Empty{})
-		log.Printf("Found %d rooms:\n", len(rooms.RoomIDs))
-		for _, v := range rooms.RoomIDs {
+		log.Printf("Found %d rooms:\n", len(rooms.RoomNames))
+		for _, v := range rooms.RoomNames {
 			log.Printf("%+v\n", v)
 		}
 		return
@@ -63,7 +63,7 @@ func main() {
 	connectionRequest := util.NewConnectionRequestForUsername(*usernameFlag)
 
 	stream, err := cl.Subscribe(context.Background(), &proto.RoomRequest{
-		RoomID:                   *roomFlag,
+		RoomName:                 *roomFlag,
 		InitialConnectionRequest: connectionRequest,
 	})
 	if err != nil {
